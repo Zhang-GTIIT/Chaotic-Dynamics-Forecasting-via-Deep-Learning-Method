@@ -11,11 +11,11 @@ Research code and reports by Zhang YUE for forecasting the Kuramoto–Sivashinsk
 
 | Directory | Contents |
 | --- | --- |
-| `code/9.18/downloaded_results/` | Source and configurations saved with the final KS runs at `ds = 16` and `ds = 32`, plus the three-model comparison script. |
-| `code/KS_3Models_Block100_fixed/` | KS implementation for 100-step block forecasts. |
-| `code/Lorenz 96/` | Lorenz–96 implementations and configurations. |
-| `code/2D_Kolmogorov/` | Two-dimensional Kolmogorov implementations and configurations. |
-| `code/LSTM_5DS_Custom(失败案例）/` | Earlier LSTM experiments across five spatial sampling factors. |
+| `code/ks/experiments/` | KS run code and configurations, organized by model and sampling factor, plus the NRMSE comparison script. |
+| `code/ks/block100_models/` | KS implementation for 100-step block forecasts. |
+| `code/ks/early_lstm_experiments/` | Earlier LSTM experiments across five spatial sampling factors. |
+| `code/lorenz96/` | Lorenz–96 implementations and configurations. |
+| `code/kolmogorov2d/` | Two-dimensional Kolmogorov implementations and configurations. |
 
 The main KS comparison observes four spatial channels at `ds = 16` and two at `ds = 32`. Each run retains its own source snapshot and configuration. The reports describe the evaluation protocol and results.
 

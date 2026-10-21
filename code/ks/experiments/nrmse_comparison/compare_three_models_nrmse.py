@@ -23,29 +23,29 @@ MODEL_STYLES = {
 CSV_PATHS = {
     16: {
         "Easy Attention + SGU": RESULTS_ROOT
-        / "EA_SGU_ds16_FINAL"
+        / "easy_attention_feature_gate_ds16"
         / "results_data"
         / "stepwise_metrics.csv",
         "Self Attention": RESULTS_ROOT
-        / "Self_Attention_ds16_FINAL"
+        / "self_attention_ds16"
         / "results_data"
         / "stepwise_metrics.csv",
         "LSTM": RESULTS_ROOT
-        / "LSTM_ds16_FINAL"
+        / "lstm_ds16"
         / "results_data"
         / "stepwise_metrics.csv",
     },
     32: {
         "Easy Attention + SGU": RESULTS_ROOT
-        / "EA_SGU_ds32_FINAL"
+        / "easy_attention_feature_gate_ds32"
         / "data"
         / "stepwise_metrics.csv",
         "Self Attention": RESULTS_ROOT
-        / "Self_Attention_ds32_FINAL"
+        / "self_attention_ds32"
         / "data"
         / "stepwise_metrics.csv",
         "LSTM": RESULTS_ROOT
-        / "LSTM_ds32_FINAL"
+        / "lstm_ds32"
         / "results_data"
         / "stepwise_metrics.csv",
     },
