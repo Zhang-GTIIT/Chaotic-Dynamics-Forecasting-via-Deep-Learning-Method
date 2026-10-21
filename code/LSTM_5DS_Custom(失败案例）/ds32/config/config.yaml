@@ -1,0 +1,44 @@
+seq_len: 512
+feature_order: 2
+encoder_dim: 128
+hidden_size: 512
+num_layers: 3
+head_dim: 256
+layer_norm_lstm: true
+batch_size: 32
+gradient_clip: 0.3
+delta_consistency_weight: 0.05
+phase_a_epochs: 15
+phase_a_lr: 0.0002
+phase_a_delta_weight: 0.1
+tbptt_segment: 50
+batches_per_epoch: 24
+phases:
+- start: 16
+  end: 30
+  horizon: 5
+  lr: 0.0002
+- start: 31
+  end: 50
+  horizon: 10
+  lr: 0.00015
+- start: 51
+  end: 80
+  horizon: 20
+  lr: 0.0001
+- start: 81
+  end: 120
+  horizon: 50
+  lr: 0.0001
+- start: 121
+  end: 180
+  horizon: 100
+  lr: 5.0e-05
+- start: 181
+  end: 260
+  horizon: 200
+  lr: 2.0e-05
+ds: 32
+D: 2
+candidate: 1
+max_epochs: 260

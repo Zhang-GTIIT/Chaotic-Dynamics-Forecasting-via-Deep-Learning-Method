@@ -1,0 +1,171 @@
+project:
+  name: LSTM_5DS_Custom
+  random_seed: 42
+  device: cuda
+  ds_order: [8, 4, 2, 1, 32]
+
+data:
+  spatial_resolution: 64
+  domain_length: 22.0
+  time_step: 0.1
+  sim_time: 10000
+  total_steps: 100000
+  transient_time: 100.0
+  train_source_trajectories: 100
+  test_source_trajectories: 100
+  train_seed: 42
+  test_seed: 4242
+  train_fraction: 0.8
+  split_seed: 42
+  h5_compression: gzip
+  h5_compression_level: 1
+
+evaluation:
+  prediction_steps: 3000
+  validation_rollout_steps: 1200
+  validation_every_epochs: 10
+  validation_trajectories: 20
+  test_trajectories: 100
+  late_window_steps: 200
+  amplitude_collapse_threshold: 0.55
+  spectral_entropy_ratio_threshold: 0.65
+  plateau_start_step: 300
+  plateau_end_step: 1200
+  plateau_fraction_threshold: 0.60
+  plateau_nrmse_min: 0.85
+  plateau_nrmse_max: 1.15
+  lyapunov_exponent: 0.043
+
+training:
+  optimizer: Adam
+  weight_decay: 0.0
+  validation_batches: 20
+  early_stopping_patience: 30
+  final_phase_min_epochs: 30
+
+ds_configs:
+  8:
+    primary:
+      seq_len: 192
+      feature_order: 1
+      encoder_dim: 128
+      hidden_size: 384
+      num_layers: 3
+      head_dim: 128
+      layer_norm_lstm: false
+      batch_size: 48
+      gradient_clip: 0.5
+      delta_consistency_weight: 0.03
+      tbptt_segment: 100
+      batches_per_epoch: 24
+      phases:
+        - {start: 1, end: 20, horizon: 10, lr: 0.0003}
+        - {start: 21, end: 50, horizon: 30, lr: 0.0002}
+        - {start: 51, end: 100, horizon: 80, lr: 0.0001}
+        - {start: 101, end: 180, horizon: 200, lr: 0.0001, cosine_min_lr: 0.00002}
+    fallback:
+      inherit: primary
+      seq_len: 256
+      hidden_size: 448
+
+  4:
+    primary:
+      seq_len: 128
+      feature_order: 0
+      encoder_dim: 128
+      hidden_size: 384
+      num_layers: 3
+      head_dim: 128
+      layer_norm_lstm: false
+      batch_size: 48
+      gradient_clip: 0.5
+      delta_consistency_weight: 0.0
+      tbptt_segment: 100
+      batches_per_epoch: 24
+      phases:
+        - {start: 1, end: 20, horizon: 20, lr: 0.0003}
+        - {start: 21, end: 50, horizon: 50, lr: 0.0002}
+        - {start: 51, end: 100, horizon: 120, lr: 0.0001}
+        - {start: 101, end: 200, horizon: 300, lr: 0.0001, cosine_min_lr: 0.00002}
+    fallback:
+      inherit: primary
+      final_horizon: 500
+
+  2:
+    primary:
+      seq_len: 96
+      feature_order: 0
+      encoder_dim: 128
+      hidden_size: 320
+      num_layers: 3
+      head_dim: 128
+      layer_norm_lstm: false
+      batch_size: 32
+      gradient_clip: 0.5
+      delta_consistency_weight: 0.0
+      tbptt_segment: 100
+      batches_per_epoch: 20
+      phases:
+        - {start: 1, end: 20, horizon: 30, lr: 0.0003}
+        - {start: 21, end: 50, horizon: 80, lr: 0.0002}
+        - {start: 51, end: 100, horizon: 160, lr: 0.0001}
+        - {start: 101, end: 200, horizon: 400, lr: 0.00005, cosine_min_lr: 0.00001}
+    fallback:
+      inherit: primary
+      final_horizon: 600
+
+  1:
+    primary:
+      seq_len: 64
+      feature_order: 0
+      encoder_dim: 128
+      hidden_size: 256
+      num_layers: 2
+      head_dim: 128
+      layer_norm_lstm: false
+      batch_size: 32
+      gradient_clip: 0.5
+      delta_consistency_weight: 0.0
+      tbptt_segment: 100
+      batches_per_epoch: 16
+      phases:
+        - {start: 1, end: 20, horizon: 50, lr: 0.0003}
+        - {start: 21, end: 50, horizon: 100, lr: 0.0002}
+        - {start: 51, end: 100, horizon: 200, lr: 0.0001}
+        - {start: 101, end: 200, horizon: 400, lr: 0.00005, cosine_min_lr: 0.00001}
+    fallback:
+      inherit: primary
+      final_horizon: 600
+
+  32:
+    primary:
+      seq_len: 512
+      feature_order: 2
+      encoder_dim: 128
+      hidden_size: 512
+      num_layers: 3
+      head_dim: 256
+      layer_norm_lstm: true
+      batch_size: 32
+      gradient_clip: 0.3
+      delta_consistency_weight: 0.05
+      phase_a_epochs: 15
+      phase_a_lr: 0.0002
+      phase_a_delta_weight: 0.1
+      tbptt_segment: 50
+      batches_per_epoch: 24
+      phases:
+        - {start: 16, end: 30, horizon: 5, lr: 0.0002}
+        - {start: 31, end: 50, horizon: 10, lr: 0.00015}
+        - {start: 51, end: 80, horizon: 20, lr: 0.0001}
+        - {start: 81, end: 120, horizon: 50, lr: 0.0001}
+        - {start: 121, end: 180, horizon: 100, lr: 0.00005}
+        - {start: 181, end: 260, horizon: 200, lr: 0.00002}
+    fallback:
+      inherit: primary
+      seq_len: 768
+      hidden_size: 640
+      batch_size: 24
+      phase_a_epochs: 30
+      max_lr: 0.00015
+

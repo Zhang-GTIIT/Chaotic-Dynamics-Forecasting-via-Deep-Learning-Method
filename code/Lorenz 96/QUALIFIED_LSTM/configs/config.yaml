@@ -1,0 +1,145 @@
+experiment:
+  system: lorenz96
+  display_name: Lorenz-96
+  system_label: K=40, F=8
+data_generation:
+  spatial_resolution: 40
+  downsampling_factors:
+  - 1
+  simulation_times:
+  - 5000
+  sim_time: 5000
+  time_step: 0.01
+  domain_length: 40.0
+  num_initial_conditions: 100
+  save_dir: data
+  train_data_path: data/lorenz96_trainval.h5
+  test_data_path: data/lorenz96_test.h5
+  state_dimension: 40
+  forcing: 8.0
+  integrator: RK4
+  integration_dt: 0.01
+  burn_in_time: 20.0
+  saved_steps: 5000
+  trainval_trajectories: 100
+  independent_test_trajectories: 20
+model:
+  d_model: 256
+  nhead: 8
+  num_layers: 3
+  dim_feedforward: 1024
+  dropout: 0.001
+  ffn_activation: gelu
+  output_head_activation: relu
+  prediction_parameterization: state_increment
+  decoder_head: state_conditioned_recurrent_increment
+easy_attention_sgu:
+  alpha_noise_std: 0.01
+lstm:
+  hidden_size: 256
+  num_layers: 3
+  dropout_keep_prob: 0.995
+  zoneout_keep_prob: 0.98
+  residual_connections: false
+  state_increment_prediction: true
+  hidden_state_propagation: 600
+  dtype: float32
+training:
+  model_type: easy_attention_sgu
+  seq_len: 128
+  pred_len: 100
+  allowed_pred_lens:
+  - 100
+  stride: 1
+  train_val_split: 0.8
+  random_seed: 42
+attention_training:
+  training_mode: block_closed_loop_curriculum
+  block_curriculum:
+  - start_epoch: 1
+    end_epoch: 20
+    num_blocks: 1
+  - start_epoch: 21
+    end_epoch: 40
+    num_blocks: 2
+  - start_epoch: 41
+    end_epoch: 60
+    num_blocks: 3
+  batch_size: 32
+  batch_size_by_blocks:
+    1: 32
+    2: 16
+    3: 8
+  learning_rate: 0.0003
+  num_epochs: 600
+  weight_decay: 0.0001
+  gradient_clip: 1.0
+  early_stopping_patience: 300
+  max_train_batches_per_epoch: 150
+  max_val_batches_per_epoch: 30
+  scheduler: cosine
+  eta_min: 1.0e-06
+  use_amp: false
+  adaptive_early_stopping:
+    max_epochs: 60
+    minimum_epochs: 40
+    patience_epochs: 10
+    relative_min_delta: 0.002
+    reset_on_rollout_improvement: true
+    rollout_patience_epochs: 15
+lstm_training:
+  training_mode: closed_loop_curriculum
+  seq_len_by_ds:
+    1: 128
+  curriculum:
+  - start_epoch: 1
+    end_epoch: 20
+    horizon: 10
+    learning_rate: 0.0005
+  - start_epoch: 21
+    end_epoch: 50
+    horizon: 20
+    learning_rate: 0.0003
+  - start_epoch: 51
+    end_epoch: 100
+    horizon: 50
+    learning_rate: 0.0002
+  - start_epoch: 101
+    end_epoch: 250
+    horizon: 100
+    learning_rate: 0.0001
+  batch_size: 64
+  learning_rate: 0.0005
+  h100_learning_rate: 0.0001
+  eta_min: 2.0e-05
+  num_epochs: 250
+  weight_decay: 0.0
+  gradient_clip: 0.5
+  early_stopping_patience: 40
+  max_batch_groups_per_epoch: 100
+  spectral_entropy_ratio_threshold: 0.65
+  use_amp: false
+  adaptive_early_stopping:
+    max_epochs: 125
+    minimum_epochs: 110
+    patience_epochs: 10
+    relative_min_delta: 0.002
+    reset_on_rollout_improvement: true
+loss:
+  type: mse
+  horizon_weighting: uniform
+  variance_weight: 0.05
+  mean_weight: 0.01
+rollout_validation:
+  enabled: true
+  every_epochs: 5
+  forecast_steps: 1200
+  late_window_steps: 200
+  collapse_std_ratio_threshold: 0.5
+prediction:
+  total_pred_steps: 3000
+  minimum_required_steps: 1200
+  num_eval_trajectories: 20
+  lyapunov_exponent: 1.68
+  nrmse_plot_floor: 1.0e-10
+  test_data_path: data/lorenz96_test.h5

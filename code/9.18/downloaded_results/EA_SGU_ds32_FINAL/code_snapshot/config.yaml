@@ -1,0 +1,95 @@
+data_generation:
+  spatial_resolution: 64
+  downsampling_factors: [16, 32]
+  simulation_times: [10000]
+  sim_time: 10000
+  time_step: 0.1
+  domain_length: 22.0
+  num_initial_conditions: 100
+  save_dir: 'data'
+
+model:
+  d_model: 256
+  nhead: 8
+  num_layers: 3
+  dim_feedforward: 1024
+  dropout: 0.001
+  ffn_activation: "gelu"
+  output_head_activation: "relu"
+
+easy_attention_sgu:
+  alpha_noise_std: 0.01
+
+lstm:
+  hidden_size: 256
+  num_layers: 3
+  dropout_keep_prob: 0.995
+  zoneout_keep_prob: 0.98
+  residual_connections: false
+  hidden_state_propagation: 600
+  dtype: "float32"
+
+training:
+  model_type: "easy_attention_sgu"
+  seq_len: 128
+  pred_len: 100
+  allowed_pred_lens: [100, 120]
+  stride: 1
+  train_val_split: 0.8
+  random_seed: 42
+
+attention_training:
+  batch_size: 32
+  learning_rate: 0.0001
+  num_epochs: 600
+  weight_decay: 0.0001
+  gradient_clip: 1.0
+  early_stopping_patience: 300
+  max_train_batches_per_epoch: 500
+  max_val_batches_per_epoch: 100
+  scheduler: "cosine"
+  eta_min: 0.000001
+  use_amp: false
+
+lstm_training:
+  training_mode: "closed_loop_curriculum"
+  batch_size: 64
+  learning_rate: 0.0005
+  num_epochs: 250
+  weight_decay: 0.0
+  gradient_clip: 0.5
+  early_stopping_patience: 40
+  early_stopping_start_epoch: 101
+  max_train_batches_per_epoch: 200
+  max_val_batches_per_epoch: 50
+  fixed_validation_horizon: 100
+  rollout_every_epochs: 5
+  use_amp: false
+  curriculum:
+    - end_epoch: 20
+      horizon: 10
+    - end_epoch: 50
+      horizon: 20
+    - end_epoch: 100
+      horizon: 50
+    - end_epoch: 250
+      horizon: 100
+
+loss:
+  type: "mse"
+  horizon_weighting: "uniform"
+
+rollout_validation:
+  enabled: true
+  every_epochs: 10
+  forecast_steps: 1200
+  late_window_steps: 200
+  collapse_std_ratio_threshold: 0.5
+
+prediction:
+  total_pred_steps: 3000
+  minimum_required_steps: 1200
+  num_eval_trajectories: 100
+  lyapunov_exponent: 0.043
+  nrmse_plot_floor: 1.0e-10
+  test_data_path: null
